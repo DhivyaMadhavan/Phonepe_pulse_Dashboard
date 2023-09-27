@@ -6,9 +6,9 @@ import mysql.connector
 import pandas as pd
 import plotly.express as px
 from PIL import Image
-import time
 import json
-from urllib.request import urlopen
+import time
+#from urllib.request import urlopen
 from streamlit_option_menu import option_menu
 
 css = '''
@@ -77,9 +77,9 @@ if select == 'About':
                     Founded in December 2015, PhonePe has been a strong beneficiary of the API driven digitisation of payments in India. When we started, we were constantly looking for granular and definitive data sources on digital payments in India.
                     PhonePe Pulse is our way of giving back to the digital payments ecosystem """)
        st.write("---")
-       st.markdown("##### :navblue[Technologies used :] Github Cloning, Python, Pandas, MySQL,mysql-connector-python, Streamlit, and Plotly,Geopandas,Matplotlib.pyplot.")
-       st.markdown("##### :navblue[Overview :] The Phonepe pulse Github repository contains a large amount of data related tovarious metrics and statistics. The goal is to extract this data and process it to obtain insights and information that can be visualized in a user-friendly manner.")
-       st.markdown("##### :blue[Approach :]")
+       st.markdown("###### :blue[Technologies used :] Github Cloning, Python, Pandas, MySQL,mysql-connector-python, Streamlit, and Plotly,Geopandas,Matplotlib.pyplot.")
+       st.markdown("###### :blue[Overview :] The Phonepe pulse Github repository contains a large amount of data related tovarious metrics and statistics. The goal is to extract this data and process it to obtain insights and information that can be visualized in a user-friendly manner.")
+       st.markdown("###### :blue[Approach :]")
        st.info("""               
              - Data extraction: The clone of Github using scripting is done to fetch the data from the
                Phonepe pulse Github repository and then stored it in a suitable format such as CSV
@@ -225,8 +225,7 @@ if select == 'Basic insights':
       with col1:
             type=st.selectbox('**Select Type**', ('','Transaction','User'),key='in_tr_type',placeholder="Select...",disabled=False,label_visibility='visible')
       with option_empty: 
-            option = st.radio("select",('State','District','Pincodes'))
-            
+            option = st.radio("select",('State','District','Pincodes'))            
       with col3:
             year=st.slider('**Select Year**', 2018,2023)
       with col4:
@@ -236,37 +235,46 @@ if select == 'Basic insights':
       if type == 'Transaction' and option == "State" :
             trcol1,trcol2 = st.columns([5,7],gap = "medium") 
             with trcol1:
-                  st.markdown('#### :blue[State]')            
-                  c.execute(f"select State as state,sum(Transaction_Count) as total_count,sum(Transaction_Amount) as total_amount from agg_trans where Year ={year} and Quarter = {quarter} group by state order by total_amount desc limit 10")
-                  df1 = pd.DataFrame(c.fetchall(),columns=["State","Transaction_Count","Transaction_Amount"]) 
-                  st.dataframe(df1) 
-                         
-            with trcol2:
-                  fig = px.bar(df1, x = 'State', y = 'Transaction_Amount', color = 'Transaction_Count')
-                  st.plotly_chart(fig,use_container_width=True)
+                  st.markdown('#### :blue[State]')
+                  if year == 2023 and quarter in [3,4]:
+                        st.markdown("#### Sorry No Data to Display for 2023 Qtr 3,4") 
+                  else:                  
+                        c.execute(f"select State as state,sum(Transaction_Count) as total_count,sum(Transaction_Amount) as total_amount from agg_trans where Year ={year} and Quarter = {quarter} group by state order by total_amount desc limit 10")
+                        df1 = pd.DataFrame(c.fetchall(),columns=["State","Transaction_Count","Transaction_Amount"]) 
+                        st.dataframe(df1)                               
+                        with trcol2:
+                              fig = px.bar(df1, x = 'State', y = 'Transaction_Amount', color = 'Transaction_Count')
+                              st.plotly_chart(fig,use_container_width=True)
 
             
       elif type == 'Transaction' and option == "District":               
             trcol1,trcol2 = st.columns([5,7],gap = "medium") 
             with trcol1:
-                  st.markdown('#### :blue[District]')                               
-                  c.execute(f"select District as district,sum(District_Count) as total_count ,sum(District_Amount)as total_amount  from map_trans where year = {year} and quarter = {quarter} group by district order by total_amount desc limit 10" )
-                  df2 = pd.DataFrame(c.fetchall(),columns=["District","District_Count","District_Amount"]) 
-                  st.dataframe(df2)
-                  with trcol2:
-                        fig = px.bar(df2, x = 'District', y = 'District_Amount', color = 'District_Count')
-                        st.plotly_chart(fig,use_container_width=True)
+                  st.markdown('#### :blue[District]') 
+                  if year == 2023 and quarter in [3,4]:
+                        st.markdown("#### Sorry No Data to Display for 2023 Qtr 3,4") 
+                  else:                           
+                        c.execute(f"select District as district,sum(District_Count) as total_count ,sum(District_Amount)as total_amount  from map_trans where year = {year} and quarter = {quarter} group by district order by total_amount desc limit 10" )
+                        df2 = pd.DataFrame(c.fetchall(),columns=["District","District_Count","District_Amount"]) 
+                        st.dataframe(df2)
+                        with trcol2:
+                              fig = px.bar(df2, x = 'District', y = 'District_Amount', color = 'District_Count')
+                              st.plotly_chart(fig,use_container_width=True)
                   
       elif (type == 'Transaction' and option == "Pincodes") :
         trcol1,trcol2 = st.columns([5,7],gap = "medium") 
         with trcol1:
-                  st.markdown('#### :blue[Pincodes]')            
-                  c.execute(f"select Pincodes as pincodes,sum(Transaction_Count) as total_count,sum(Transaction_Amount) as total_amount from top_trans_pincode where Year ={year} and Quarter = {quarter} group by pincodes order by total_amount desc limit 10")
-                  df3 = pd.DataFrame(c.fetchall(),columns=["Pincodes","Transaction_count","Transaction_amount"]) 
-                  st.dataframe(df3)        
-        with trcol2:
-                  fig = px.bar(df3, x = 'Pincodes', y = 'Transaction_amount', color = 'Transaction_count')
-                  st.plotly_chart(fig,use_container_width=True) 
+                  st.markdown('#### :blue[Pincodes]') 
+                  if year == 2023 and quarter in [3,4]:
+                        st.markdown("#### Sorry No Data to Display for 2023 Qtr 3,4")
+                  else:            
+                        c.execute(f"select Pincodes as pincodes,sum(Transaction_Count) as total_count,sum(Transaction_Amount) as total_amount from top_trans_pincode where Year ={year} and Quarter = {quarter} group by pincodes order by total_amount desc limit 10")
+                        df3 = pd.DataFrame(c.fetchall(),columns=["Pincodes","Transaction_count","Transaction_amount"]) 
+                        st.dataframe(df3)        
+                        with trcol2:
+                              fig = px.bar(df3, x = 'Pincodes', y = 'Transaction_amount', color = 'Transaction_count')
+                              st.plotly_chart(fig,use_container_width=True) 
+
 
       if type == 'User':
             with option_empty: 
